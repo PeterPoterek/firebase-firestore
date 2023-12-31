@@ -43,6 +43,20 @@ const categoriesDisplay = document.querySelector("#categories");
 const booksDisplay = document.querySelector("#books-display");
 const modal = document.querySelector("#modal");
 
+const loader = document.getElementById("loaderContainer");
+
+const showLoader = () => {
+  loader.classList.remove("fade-out");
+  loader.classList.add("fade-in");
+};
+
+const disableLoader = () => {
+  loader.classList.remove("fade-in");
+  loader.classList.add("fade-out");
+};
+
+disableLoader();
+
 const fetchAllCategories = () => {
   const url = "https://books-backend.p.goit.global/books/category-list";
 
@@ -69,37 +83,51 @@ const fetchAllCategories = () => {
 };
 
 const fetchCategory = (categoryName) => {
+  showLoader();
+
   const url = `https://books-backend.p.goit.global/books/category?category=${categoryName}`;
 
-  axios.get(url).then((res) => {
-    booksDisplay.innerHTML = "";
-    const data = res.data;
-    const cardsToRender = [];
-    data.forEach((item) => {
-      const card = document.createElement("div");
-      card.classList.add("book-card");
-      card.setAttribute("id", item._id);
+  axios
+    .get(url)
+    .then((res) => {
+      booksDisplay.innerHTML = "";
+      const data = res.data;
+      const cardsToRender = [];
+      data.forEach((item) => {
+        const card = document.createElement("div");
+        card.classList.add("book-card");
+        card.setAttribute("id", item._id);
 
-      const title = document.createElement("h1");
-      title.textContent = item.title;
+        const title = document.createElement("h2");
+        title.textContent = item.title;
 
-      const img = document.createElement("img");
-      img.setAttribute("src", item.book_image);
+        const img = document.createElement("img");
+        img.setAttribute("src", item.book_image);
 
-      card.append(img, title);
-      cardsToRender.push(card);
+        card.append(img, title);
+        cardsToRender.push(card);
+      });
+
+      booksDisplay.append(...cardsToRender);
+    })
+    .finally(() => {
+      disableLoader();
     });
-
-    booksDisplay.append(...cardsToRender);
-  });
 };
 
 const fetchBookByID = (id) => {
+  showLoader();
+
   const url = `https://books-backend.p.goit.global/books/${id}`;
 
-  return axios.get(url).then((res) => {
-    return res.data;
-  });
+  return axios
+    .get(url)
+    .then((res) => {
+      return res.data;
+    })
+    .finally(() => {
+      disableLoader();
+    });
 };
 
 fetchAllCategories();
