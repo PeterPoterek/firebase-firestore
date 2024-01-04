@@ -2,6 +2,7 @@ import "modern-normalize/modern-normalize.css";
 import axios from "axios";
 import { initializeApp } from "firebase/app";
 import { getFirestore, collection, getDocs } from "firebase/firestore";
+import { getAuth, createUserWithEmailAndPassword, signOut, signInWithEmailAndPassword, onAuthStateChanged } from "firebase/auth";
 const firebaseConfig = {
   apiKey: "AIzaSyCVZZ-ouV2hdiE9vqhsBml1UIMEkmhjvkk",
   authDomain: "fir-practice-87e21.firebaseapp.com",
@@ -16,6 +17,7 @@ const firebaseConfig = {
 initializeApp(firebaseConfig);
 
 const db = getFirestore();
+const auth = getAuth();
 
 const colRef = collection(db, "users");
 
@@ -38,7 +40,7 @@ getDocs(colRef)
 //
 //
 //
-
+// Fetch
 const categoriesDisplay = document.querySelector("#categories");
 const booksDisplay = document.querySelector("#books-display");
 const modal = document.querySelector("#modal");
@@ -191,4 +193,68 @@ booksDisplay.addEventListener("click", async (e) => {
 
   modal.classList.toggle("hidden");
   modalDisplay.append(img, bookTitle, bookAuthor, bookDesc, amazonURL, addToShoppingListButton, closeButtton);
+});
+
+//Login
+
+const registerForm = document.querySelector("#register-form");
+const loginForm = document.querySelector("#login-form");
+const usernameDisplay = document.querySelector("#username-display");
+
+const loginBtn = document.querySelector("#login");
+const logoutBtn = document.querySelector("#logout");
+
+registerForm.addEventListener("submit", (e) => {
+  e.preventDefault();
+
+  console.log(e.target.name.value);
+  console.log(e.target.email.value);
+  console.log(e.target.password.value);
+
+  const name = e.target.name.value;
+  const email = e.target.email.value;
+  const password = e.target.password.value;
+
+  createUserWithEmailAndPassword(auth, email, password)
+    .then((cred) => {
+      cred.user.displayName = name;
+
+      console.log("user created", cred.user);
+
+      registerForm.reset();
+    })
+    .catch((err) => alert(err));
+});
+
+loginForm.addEventListener("submit", (e) => {
+  e.preventDefault();
+
+  const email = e.target.email.value;
+  const password = e.target.password.value;
+
+  signInWithEmailAndPassword(auth, email, password)
+    .then((cred) => {
+      console.log(cred.user, "Logged in");
+    })
+    .catch((err) => {
+      alert(err);
+    });
+});
+
+logoutBtn.addEventListener("click", () => {
+  signOut(auth)
+    .then(() => {
+      console.log("User signed out");
+      usernameDisplay.textContent = "";
+    })
+    .catch((err) => {
+      alert(err);
+    });
+});
+
+onAuthStateChanged(auth, (user) => {
+  if (user) {
+    console.log(user);
+    usernameDisplay.textContent = `Welcome ${user.email}`;
+  }
 });

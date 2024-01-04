@@ -8,6 +8,30 @@
     <title>Vite App</title>
   </head>
   <body>
+    <nav class="login-nav">
+      <ul class="login-nav-list">
+        <li>
+          <h1 id="username-display"></h1>
+          <div>
+            <form id="register-form" action="">
+              <input name="name" type="text" required />
+              <input name="email" type="email" required />
+              <input name="password" type="password" required />
+
+              <button id="register">Register</button>
+            </form>
+
+            <form id="login-form" action="">
+              <input name="email" type="email" required />
+              <input name="password" type="password" required />
+
+              <button id="login">Login</button>
+            </form>
+            <button id="logout">Logout</button>
+          </div>
+        </li>
+      </ul>
+    </nav>
     <ul id="categories"></ul>
 
     <div id="books-display"></div>
