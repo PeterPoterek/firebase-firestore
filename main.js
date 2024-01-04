@@ -2,7 +2,7 @@ import "modern-normalize/modern-normalize.css";
 import axios from "axios";
 import { initializeApp } from "firebase/app";
 import { getFirestore, collection, getDocs } from "firebase/firestore";
-import { getAuth, createUserWithEmailAndPassword, signOut, signInWithEmailAndPassword, onAuthStateChanged } from "firebase/auth";
+import { getAuth, createUserWithEmailAndPassword, updateProfile, signOut, signInWithEmailAndPassword, onAuthStateChanged } from "firebase/auth";
 const firebaseConfig = {
   apiKey: "AIzaSyCVZZ-ouV2hdiE9vqhsBml1UIMEkmhjvkk",
   authDomain: "fir-practice-87e21.firebaseapp.com",
@@ -201,15 +201,10 @@ const registerForm = document.querySelector("#register-form");
 const loginForm = document.querySelector("#login-form");
 const usernameDisplay = document.querySelector("#username-display");
 
-const loginBtn = document.querySelector("#login");
 const logoutBtn = document.querySelector("#logout");
 
 registerForm.addEventListener("submit", (e) => {
   e.preventDefault();
-
-  console.log(e.target.name.value);
-  console.log(e.target.email.value);
-  console.log(e.target.password.value);
 
   const name = e.target.name.value;
   const email = e.target.email.value;
@@ -217,11 +212,13 @@ registerForm.addEventListener("submit", (e) => {
 
   createUserWithEmailAndPassword(auth, email, password)
     .then((cred) => {
-      cred.user.displayName = name;
+      return updateProfile(cred.user, { displayName: name })
+        .then(() => {
+          console.log("user created with display name", cred.user);
 
-      console.log("user created", cred.user);
-
-      registerForm.reset();
+          registerForm.reset();
+        })
+        .catch((err) => alert(err));
     })
     .catch((err) => alert(err));
 });
@@ -255,6 +252,8 @@ logoutBtn.addEventListener("click", () => {
 onAuthStateChanged(auth, (user) => {
   if (user) {
     console.log(user);
-    usernameDisplay.textContent = `Welcome ${user.email}`;
+    if (user.displayName) {
+      usernameDisplay.textContent = `Welcome ${user.displayName}`;
+    }
   }
 });
